@@ -1,1 +1,1 @@
-# udacity_starbucksprojects
+# udacity_starbucks_project
