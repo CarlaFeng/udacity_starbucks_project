@@ -14876,8 +14876,8 @@ memory usage: 19.7+ MB
 <div class="prompt input_prompt">In&nbsp;[35]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#训练模型</span>
-<span class="n">model</span><span class="o">=</span><span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">oob_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#训练模型 随机森林</span>
+<span class="n">RF_model</span><span class="o">=</span><span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span><span class="n">n_jobs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">oob_score</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                              <span class="n">min_samples_split</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span><span class="n">class_weight</span><span class="o">=</span><span class="s1">&#39;balanced&#39;</span><span class="p">)</span>
 
 <span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">Y_train</span><span class="p">)</span>
@@ -14886,7 +14886,7 @@ memory usage: 19.7+ MB
 <span class="n">df_Y_pred</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">Y_pred</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">Y_test</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
 
 <span class="c1">#分析报告</span>
-<span class="c1">#用f1-score来衡量模型质量</span>
+<span class="c1">#用precision来衡量模型质量</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">,</span> <span class="n">target_names</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">Y_test</span><span class="o">.</span><span class="n">columns</span><span class="p">)))</span>
 </pre></div>
 
@@ -14906,10 +14906,10 @@ memory usage: 19.7+ MB
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>                     precision    recall  f1-score   support
 
- target_customer_no       0.38      0.90      0.53     13715
-target_customer_yes       0.88      0.32      0.47     30140
+ target_customer_no       0.38      0.89      0.53     13838
+target_customer_yes       0.87      0.32      0.47     30017
 
-        avg / total       0.72      0.50      0.49     43855
+        avg / total       0.71      0.50      0.49     43855
 
 </pre>
 </div>
@@ -14918,6 +14918,86 @@ target_customer_yes       0.88      0.32      0.47     30140
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[42]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># 训练模型 Logistic Regression Classifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="k">import</span> <span class="n">LogisticRegression</span>
+<span class="c1">#划分训练集与测试集，测试集的比例为10%</span>
+<span class="n">prepared_dataset_dummy</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">prepared_dataset</span><span class="p">,</span> <span class="n">dummy_na</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;offer_type&#39;</span><span class="p">,</span><span class="s1">&#39;gender&#39;</span><span class="p">],</span><span class="n">drop_first</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;gender_O&#39;</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">X</span><span class="o">=</span><span class="n">prepared_dataset_dummy</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;person&#39;</span><span class="p">,</span><span class="s1">&#39;target_customer&#39;</span><span class="p">],</span><span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">Y</span><span class="o">=</span><span class="n">prepared_dataset_dummy</span><span class="p">[[</span><span class="s1">&#39;target_customer&#39;</span><span class="p">]]</span>
+<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">Y_train</span><span class="p">,</span> <span class="n">Y_pred</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span><span class="n">test_size</span><span class="o">=</span><span class="mf">0.10</span><span class="p">)</span>
+<span class="n">clf</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">penalty</span><span class="o">=</span><span class="s1">&#39;l2&#39;</span><span class="p">)</span>
+<span class="n">clf</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span><span class="n">Y_train</span><span class="p">)</span>
+<span class="n">Y_pred</span> <span class="o">=</span> <span class="n">clf</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="c1">#用precision来衡量模型质量</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">classification_report</span><span class="p">(</span><span class="n">Y_test</span><span class="p">,</span> <span class="n">Y_pred</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/opt/conda/lib/python3.6/site-packages/sklearn/utils/validation.py:578: DataConversionWarning: A column-vector y was passed when a 1d array was expected. Please change the shape of y to (n_samples, ), for example using ravel().
+  y = column_or_1d(y, warn=True)
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>             precision    recall  f1-score   support
+
+         no       0.00      0.00      0.00     13888
+        yes       0.68      1.00      0.81     29967
+
+avg / total       0.47      0.68      0.55     43855
+
+</pre>
+</div>
+</div>
+
+<div class="output_area">
+
+    <div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>/opt/conda/lib/python3.6/site-packages/sklearn/metrics/classification.py:1135: UndefinedMetricWarning: Precision and F-score are ill-defined and being set to 0.0 in labels with no predicted samples.
+  &#39;precision&#39;, &#39;predicted&#39;, average, warn_for)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>比较结果：Logistic Regression Classifier的precision比Random forest差，不采用这个模型。</p>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
@@ -14939,7 +15019,7 @@ target_customer_yes       0.88      0.32      0.47     30140
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">call</span>
@@ -14947,6 +15027,26 @@ target_customer_yes       0.88      0.32      0.47     30140
 </pre></div>
 
     </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+    <div class="prompt output_prompt">Out[1]:</div>
+
+
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0</pre>
+</div>
+
+</div>
+
 </div>
 </div>
 
